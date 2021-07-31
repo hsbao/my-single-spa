@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Single SPA</title>
+  </head>
+  <body>
+    <a onclick="app1()" style="margin-right: 20px">应用1</a>
+    <a onclick="app2()">应用2</a>
+    <script src="./lib/umd/my-single-spa.js"></script>
+    <script>
+      function app1() {
+        history.pushState({}, '', '/app1')
+      }
+      function app2() {
+        history.pushState({}, '', '/app2')
+      }
+
+      // registerApplication 注册子应用：默认只是加载子应用，此时并没有挂载
+      // 参数1：注册应用的名称
+      // 参数2： 加载app的方法，必须是返回一个Promise方法
+      // 参数3：切换的时候，匹配子应用的条件，如果匹配上了，则激活该应用
+      // 参数4：自定义props
+      singleSpa.registerApplication(
+        'appName1',
+        async (props) => {
+          return {
+            bootstrap: async (props) => {
+              console.log('bootstrap1')
+            },
+            mount: async (props) => {
+              console.log('mount1')
+            },
+            unmount: async (props) => {
+              console.log('unmount1')
+            },
+          }
+        },
+        (location) => location.pathname.indexOf('/app1') > -1
+      )
+
+      singleSpa.registerApplication(
+        'appName2',
+        async (props) => {
+          return {
+            bootstrap: async (props) => {
+              console.log('bootstrap2')
+            },
+            mount: async (props) => {
+              console.log('mount2')
+            },
+            unmount: async (props) => {
+              console.log('unmount2')
+            },
+          }
+        },
+        (location) => location.pathname.indexOf('/app2') > -1,
+        {
+          store: { a: 2 },
+        }
+      )
+
+      // start 启动应用：挂载子应用
+      singleSpa.start()
+    </script>
+  </body>
+</html>
